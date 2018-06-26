@@ -3,10 +3,11 @@ from time import time
 import requests
 import schedule
 
-
+file = open('timeData.txt', 'a')
 timingData = []
 
 schedule.clear()
+
 
 def fileParser(fileName):
     file = open(fileName)
@@ -16,7 +17,7 @@ def fileParser(fileName):
         line[2] = line[2][0:-1]
         line = [float(number) for number in line]
         locations.append(line)
-    print(locations)
+    #print(locations)
     return locations
 
 
@@ -69,6 +70,12 @@ def dataRequest(locations):
     return posts
 
 
+def analyzeTime(data):
+    for radius, timeTaken in data:
+        file.write("Radius: " + str(radius)[0:4] + "  Time: " + str(timeTaken)[0:10] + "  ")
+    file.write("\n")
+
+
 def job():
     if __name__ == "__main__":
         locationList = fileParser("locations.txt")
@@ -81,11 +88,18 @@ def job():
         db.posts.delete_many({})
 
         dataRequest(locationList)
+        analyzeTime(timingData)
+        timingData.clear()
+        print(timingData)
 
-
-schedule.every(30).seconds.do(job)
+job()
+job()
+job()
+job()
+#schedule.every(10).seconds.do(job)
 #schedule.every(30).minutes.do(job)
 
-while True:
-    schedule.run_pending()
+#while True:
+ #   schedule.run_pending()
+
 
