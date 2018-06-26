@@ -58,3 +58,17 @@ def dataRequest(locations):
                 'phone': data[airport][1]
             }
             posts.insert_one(post_data)
+
+        return posts
+
+
+if __name__ == "__main__":
+    locationList = fileParser("locations.txt")
+
+    # Mongo DB initialization
+    client = MongoClient()
+    db = client['Airports']
+    posts = db.posts
+    db.posts.delete_many({})
+
+    dataRequest(locationList)
