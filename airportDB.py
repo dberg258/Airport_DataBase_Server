@@ -50,3 +50,11 @@ def dataRequest(locations):
                 location = "{}, {}, {}".format(city, state, country)
                 phone = info['properties']['phone']
                 data[airport] = [location, phone]
+
+        for airport in data:
+            post_data = {
+                'name': airport,
+                'location': data[airport][0],
+                'phone': data[airport][1]
+            }
+            posts.insert_one(post_data)
