@@ -1,2 +1,6 @@
 #.gitignore
 .idea/misc.xml
+.idea/modules.xml
+.idea/Airport_DataBase_Server.iml
+.idea/workspace.xml
+venv/
