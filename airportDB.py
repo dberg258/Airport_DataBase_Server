@@ -1,9 +1,12 @@
 from pymongo import MongoClient
 from time import time
 import requests
+import schedule
+
 
 timingData = []
 
+schedule.clear()
 
 def fileParser(fileName):
     file = open(fileName)
@@ -13,7 +16,7 @@ def fileParser(fileName):
         line[2] = line[2][0:-1]
         line = [float(number) for number in line]
         locations.append(line)
-    # print(locations)
+    print(locations)
     return locations
 
 
@@ -66,13 +69,23 @@ def dataRequest(locations):
     return posts
 
 
-if __name__ == "__main__":
-    locationList = fileParser("locations.txt")
+def job():
+    if __name__ == "__main__":
+        locationList = fileParser("locations.txt")
 
-    # Mongo DB initialization
-    client = MongoClient()
-    db = client['Airports']
-    posts = db.posts
-    db.posts.delete_many({})
+        # Mongo DB initialization
+        client = MongoClient()
+        db = client['Airports']
+        global posts
+        posts = db.posts
+        db.posts.delete_many({})
 
-    dataRequest(locationList)
+        dataRequest(locationList)
+
+
+schedule.every(30).seconds.do(job)
+#schedule.every(30).minutes.do(job)
+
+while True:
+    schedule.run_pending()
+
