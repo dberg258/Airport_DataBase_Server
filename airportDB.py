@@ -4,6 +4,7 @@ import requests
 
 timingData = []
 
+
 def fileParser(fileName):
     file = open(fileName)
     locations = []
@@ -59,7 +60,10 @@ def dataRequest(locations):
             }
             posts.insert_one(post_data)
 
-        return posts
+    for post in posts.find():
+        print(post)
+
+    return posts
 
 
 if __name__ == "__main__":
