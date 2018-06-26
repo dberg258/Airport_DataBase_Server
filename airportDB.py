@@ -38,3 +38,15 @@ def dataRequest(locations):
         endTime = time()
         timingData.append((coordinates[2], endTime - startTime))
         request = r.json()
+
+        data = {}
+
+        for info in request['data']['advisories']:
+            if 'airport_name' in info['properties']:
+                airport = info['properties']['airport_name']
+                city = info['city']
+                state = info['state']
+                country = info['country']
+                location = "{}, {}, {}".format(city, state, country)
+                phone = info['properties']['phone']
+                data[airport] = [location, phone]
