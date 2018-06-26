@@ -2,6 +2,7 @@ from pymongo import MongoClient
 from time import time
 import requests
 import schedule
+import csv
 
 file = open('timeData.txt', 'a')
 timingData = []
@@ -30,50 +31,58 @@ def dataRequest(locations):
                      '1NH0.f43-dAkFA6VXdqoueqTUe6n9w1-TWDw3zyVJEZ86GxM'
     }
 
-    for coordinates in locations:
-        query = {
-            'latitude': coordinates[1],
-            'longitude': coordinates[0],
-            'types': 'airport',
-            'buffer': coordinates[2]
-        }
+    for radius in range(250, 1001, 250):
 
-        startTime = time()
-        r = requests.get('https://api.airmap.com/status/v2/point', params=query, headers=headers)
-        endTime = time()
-        timingData.append((coordinates[2], endTime - startTime))
-        request = r.json()
+        timingDataSingleLocation = []
 
-        data = {}
-
-        for info in request['data']['advisories']:
-            if 'airport_name' in info['properties']:
-                airport = info['properties']['airport_name']
-                city = info['city']
-                state = info['state']
-                country = info['country']
-                location = "{}, {}, {}".format(city, state, country)
-                phone = info['properties']['phone']
-                data[airport] = [location, phone]
-
-        for airport in data:
-            post_data = {
-                'name': airport,
-                'location': data[airport][0],
-                'phone': data[airport][1]
+        for coordinates in locations:
+            query = {
+                'latitude': coordinates[1],
+                'longitude': coordinates[0],
+                'types': 'airport',
+                # 'buffer': coordinates[2] // this is for when using just the location document
+                'buffer': radius
             }
-            posts.insert_one(post_data)
+
+            startTime = time()
+            r = requests.get('https://api.airmap.com/status/v2/point', params=query, headers=headers)
+            endTime = time()
+            timingDataSingleLocation.append([radius, endTime - startTime]) # coordinates[2] replace radius with this when using location file
+            request = r.json()
+
+            airportData = {}
+
+            for info in request['data']['advisories']:
+                if 'airport_name' in info['properties']:
+                    airport = info['properties']['airport_name']
+                    city = info['city']
+                    state = info['state']
+                    country = info['country']
+                    location = "{}, {}, {}".format(city, state, country)
+                    phone = info['properties']['phone']
+                    airportData[airport] = [location, phone]
+
+            for airport in airportData:
+                post_data = {
+                    'name': airport,
+                    'location': airportData[airport][0],
+                    'phone': airportData[airport][1]
+                }
+                posts.insert_one(post_data)
+
+        timingData.append(timingDataSingleLocation)
 
     for post in posts.find():
-        print(post)
+            print(post)
 
     return posts
 
 
 def analyzeTime(data):
-    for radius, timeTaken in data:
-        file.write("Radius: " + str(radius)[0:4] + "  Time: " + str(timeTaken)[0:10] + "  ")
-    file.write("\n")
+    myFile = open('timeData2.csv', 'a')
+    with myFile:
+        writer = csv.writer(myFile)
+        writer.writerows(data)
 
 
 def job():
@@ -88,18 +97,15 @@ def job():
         db.posts.delete_many({})
 
         dataRequest(locationList)
+
         analyzeTime(timingData)
-        timingData.clear()
         print(timingData)
+        timingData.clear()
 
-job()
-job()
-job()
-job()
 #schedule.every(10).seconds.do(job)
-#schedule.every(30).minutes.do(job)
+schedule.every(20).minutes.do(job)
 
-#while True:
- #   schedule.run_pending()
+while True:
+    schedule.run_pending()
 
 
