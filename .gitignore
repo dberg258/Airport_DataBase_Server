@@ -4,4 +4,5 @@
 .idea/Airport_DataBase_Server.iml
 .idea/workspace.xml
 venv/
+.DS_Store
 .idea/
