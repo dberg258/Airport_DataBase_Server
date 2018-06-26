@@ -1,5 +1,12 @@
+from pymongo import MongoClient
 import tornado.ioloop
 import tornado.web
+
+
+client = MongoClient()
+db = client.Airports
+posts = db.posts
+
 
 class MainHandler(tornado.web.RequestHandler):
 
@@ -11,7 +18,7 @@ class MainHandler(tornado.web.RequestHandler):
 
     def post(self):
         self.write('<input type="button" value="New Submission" onClick="window.location.reload()">')
-        airportName = airportDB3.posts.find_one({'name': self.get_body_argument("message")})
+        airportName = posts.find_one({'name': self.get_body_argument("message")})
         self.write("Phone: " + airportName['phone'])
 
 
