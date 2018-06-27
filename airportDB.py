@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from time import time
+import time
 import requests
 import schedule
 import csv
@@ -31,7 +32,7 @@ def dataRequest(locations):
                      '1NH0.f43-dAkFA6VXdqoueqTUe6n9w1-TWDw3zyVJEZ86GxM'
     }
 
-    for radius in range(250, 1001, 250):
+    for radius in range(250, 10001, 250):
 
         timingDataSingleLocation = []
 
@@ -44,9 +45,18 @@ def dataRequest(locations):
                 'buffer': radius
             }
 
-            startTime = time()
-            r = requests.get('https://api.airmap.com/status/v2/point', params=query, headers=headers)
-            endTime = time()
+            startTime = time.time()
+
+            while True:
+                try:
+                    r = requests.get('https://api.airmap.com/status/v2/point', params=query, headers=headers)
+                except:
+                    print("working")
+                    continue
+                else:
+                    break
+
+            endTime = time.time()
             timingDataSingleLocation.append([radius, endTime - startTime]) # coordinates[2] replace radius with this when using location file
             request = r.json()
 
@@ -70,10 +80,13 @@ def dataRequest(locations):
                 }
                 posts.insert_one(post_data)
 
+        for post in posts.find():
+            print(post)
         timingData.append(timingDataSingleLocation)
 
-    for post in posts.find():
-            print(post)
+        analyzeTime(timingData)
+        timingData.clear()
+
 
     return posts
 
@@ -98,14 +111,18 @@ def job():
 
         dataRequest(locationList)
 
-        analyzeTime(timingData)
-        print(timingData)
+        #analyzeTime(timingData)
+        #print(timingData)
         timingData.clear()
 
-#schedule.every(10).seconds.do(job)
-schedule.every(20).minutes.do(job)
+job()
+schedule.every(10).seconds.do(job)
+#schedule.every(20).minutes.do(job)
 
 while True:
     schedule.run_pending()
+    time.sleep(5)
+
+
 
 
