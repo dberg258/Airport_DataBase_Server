@@ -12,18 +12,18 @@ schedule.clear()
 
 
 def fileParser(fileName):
-    file = open(fileName)
+    doc = open(fileName)
     locations = []
-    for line in file:
+    for line in doc:
         line = line.split(';')
         line[2] = line[2][0:-1]
         line = [float(number) for number in line]
         locations.append(line)
-    #print(locations)
     return locations
 
 
 def dataRequest(locations):
+
     headers = {
         'X-API-Key': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVkZW50aWFsX2lkIjoiY3JlZGVudGlh'
                      'bHxOMHFkRzVTd1hxM2VrYzJrblFFN0g1UEdZa0ciLCJhcHBsaWNhdGlvbl9pZCI6ImFwcGxpY'
@@ -57,6 +57,7 @@ def dataRequest(locations):
                     break
 
             endTime = time.time()
+
             timingDataSingleLocation.append([radius, endTime - startTime]) # coordinates[2] replace radius with this when using location file
             request = r.json()
 
@@ -87,7 +88,6 @@ def dataRequest(locations):
         analyzeTime(timingData)
         timingData.clear()
 
-
     return posts
 
 
@@ -111,8 +111,6 @@ def job():
 
         dataRequest(locationList)
 
-        #analyzeTime(timingData)
-        #print(timingData)
         timingData.clear()
 
 job()
