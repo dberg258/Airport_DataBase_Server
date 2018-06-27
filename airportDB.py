@@ -34,7 +34,6 @@ def dataRequest(locations):
     for radius in range(250, 10001, 250):
 
         timingDataSingleRadius = [datetime.datetime.now()]
-        #timingDataSingleRadius.append(datetime.datetime.now())
 
         for coordinates in locations:
             query = {
@@ -114,8 +113,8 @@ def job():
         timingData.clear()
 
 job()
-schedule.every(10).seconds.do(job)
-#schedule.every(20).minutes.do(job)
+#schedule.every(10).seconds.do(job)
+schedule.every(10).minutes.do(job)
 
 while True:
     schedule.run_pending()
