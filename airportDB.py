@@ -51,7 +51,7 @@ def dataRequest(locations):
                 try:
                     r = requests.get('https://api.airmap.com/status/v2/point', params=query, headers=headers)
                 except:
-                    print("working")
+                    time.sleep(1)
                     continue
                 else:
                     break
