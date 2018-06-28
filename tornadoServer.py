@@ -24,6 +24,8 @@ def spellCheck(inputted):
         if letterCount / len(word) >= .65:
             recommendations.add(word)
 
+    if len(recommendations) == 0:
+        recommendations.add("No Recommendations Available")
     return recommendations
 
 
