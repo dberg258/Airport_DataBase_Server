@@ -106,7 +106,7 @@ def dataRequest(locations):
         'X-API-Key': APIKEY
     }
 
-    for radius in range(250, 501, 250):
+    for radius in range(250, 10001, 250):
         locationCounter = 0
         for locationCoordinates in locations:
             locationCounter += 1
@@ -116,7 +116,6 @@ def dataRequest(locations):
             query = queryCreation(locationCoordinates, radius)
             (exceptionThrownBoolean, response, timeElapsed) = apiRequest(query, headers)
             apiResponse = response.json()
-            print(apiResponse)
             timingDataSingleLocation.extend((timeElapsed, len(apiResponse['data']['advisories']), exceptionThrownBoolean))
 
             airportData = apiResponseParse(apiResponse)
@@ -133,7 +132,7 @@ def dataRequest(locations):
 
 def scheduler():
     # schedule.every(10).seconds.do(job)
-    schedule.every(10).minutes.do(main)
+    schedule.every(20).minutes.do(main)
 
     while True:
         schedule.run_pending()
