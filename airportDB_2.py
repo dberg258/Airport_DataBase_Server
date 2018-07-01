@@ -55,7 +55,7 @@ def apiResponseParse(apiResponse):
 
 
 def csvTimeDataInsertion(data):
-    myFile = open('timeData3.csv', 'a')
+    myFile = open('timeData4.csv', 'a')
     with myFile:
         writer = csv.writer(myFile)
         writer.writerows(data)
@@ -132,7 +132,7 @@ def dataRequest(locations):
 
 def scheduler():
     # schedule.every(10).seconds.do(job)
-    schedule.every(20).minutes.do(main)
+    schedule.every(10).minutes.do(main)
 
     while True:
         schedule.run_pending()
