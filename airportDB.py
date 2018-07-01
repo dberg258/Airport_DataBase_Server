@@ -1,13 +1,12 @@
 from pymongo import MongoClient
 from time import time
 import time
+import datetime
 import requests
 import schedule
 import csv
 
-file = open('timeData.txt', 'a')
 timingData = []
-
 schedule.clear()
 
 
@@ -34,7 +33,7 @@ def dataRequest(locations):
 
     for radius in range(250, 10001, 250):
 
-        timingDataSingleLocation = []
+        timingDataSingleRadius = [datetime.datetime.now()]
 
         for coordinates in locations:
             query = {
@@ -58,7 +57,7 @@ def dataRequest(locations):
 
             endTime = time.time()
 
-            timingDataSingleLocation.append([radius, endTime - startTime]) # coordinates[2] replace radius with this when using location file
+            timingDataSingleRadius.append([radius, endTime - startTime]) # coordinates[2] replace radius with this when using location file
             request = r.json()
 
             airportData = {}
@@ -83,7 +82,7 @@ def dataRequest(locations):
 
         for post in posts.find():
             print(post)
-        timingData.append(timingDataSingleLocation)
+        timingData.append(timingDataSingleRadius)
 
         analyzeTime(timingData)
         timingData.clear()
@@ -114,8 +113,8 @@ def job():
         timingData.clear()
 
 job()
-schedule.every(10).seconds.do(job)
-#schedule.every(20).minutes.do(job)
+#schedule.every(10).seconds.do(job)
+schedule.every(10).minutes.do(job)
 
 while True:
     schedule.run_pending()
